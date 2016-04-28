@@ -1,0 +1,108 @@
+@(message: String)
+@main(title="Registration"){
+	<h2>Registration Page</h2>
+	}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<script id="customMessageTemplate" type="text/html">
+	<em class="customMessage" data-bind="validationMessage: field"></em>
+</script>
+<body>
+<div data-bind=""validationOptions: { messageTemplate: 'customMessageTemplate'}">
+
+
+<form action="" id="regForm">
+	<ul>
+		<li>
+			<label for="firstName">First Name</label>
+			<input type="text" id="firstName" data-bind="value: firstName"/>
+		</li>
+		<li>
+			<label for="lastName">Last Name</label>
+			<input type="text" id="lastName" data-bind="value: lastName"/>
+		</li>
+		<li>
+			<label for="emailId">Email Id</label>
+			<input type="text" id="emailId" data-bind="value: emailId"/>
+		</li>
+		<li>
+			<label for="password">Password</label>
+			<input type="password" id="password" data-bind="value: password"/>
+		</li>
+		<li>
+			<button type="submit" data-bind="click: submit" value="Submit">Submit</button>
+		</li>
+	</ul>
+</form>
+</div>
+</body>
+<script type="text/javascript">
+	ko.validation.rules.pattern.message = 'Invalid.';
+
+	ko.validation.init({
+		registerExtenders : true,
+		messagesOnModified : true,
+		insertMessages : true,
+		parseInputAttributes : true,
+		messageTemplate : null
+	}, true);
+
+	var viewModel = {
+		firstName : ko.observable().extend({
+				required: {
+			message : "Please enter First Name"
+		}
+
+		}),
+		lastName : ko.observable().extend({
+			required: {
+				message : "Please enter Last Name"
+			}
+
+			}),
+		emailId : ko.observable().extend({
+			required: {
+				message : "Please enter Email Id"
+			},
+			email: true
+
+			}),
+		password : ko.observable().extend({
+			required: {
+				message : "Please enter Password"
+			}
+
+			}),
+		submit : function() {
+			if (viewModel.errors().length === 0) {
+				console.log("submission done ");
+				alert("hello " + ko.toJSON(viewModel));
+
+				$.ajax("/register", {
+					data : ko.toJSON(viewModel),
+					headers : {
+						'Accept' : 'application/json',
+						'Content-Type' : 'application/json'
+					},
+					type : "POST",
+					dataType : 'json',
+					success : function(result) {
+						alert(result);
+					}
+
+				});
+			} else {
+				alert('Please check your submission.');
+				viewModel.errors.showAllMessages();
+			}
+		}
+	}
+
+	viewModel.errors = ko.validation.group(viewModel);
+	ko.applyBindings(viewModel);
+</script>
+</html>
